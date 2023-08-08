@@ -31,7 +31,7 @@ int preassembler_file(char* fileName) {
 	}
 
 	/*Checks whether the new am file creates successfully*/
-	amFile = fopen(amFileName, "w");
+	amFile = fopen(amFileName, "w+");
 	if(amFile == NULL) {
 		printf("The file is failed.\n");
 		free(amFileName);
@@ -42,8 +42,10 @@ int preassembler_file(char* fileName) {
 		return 0;		
 	}
 
-	while(fgets(currLine, MAX_LENGTH_LINE + 2, amFile)) {
+	while(fgets(currLine, MAX_LENGTH_LINE + 2, asFile)) {
 		i = 0;
+		skip_white(currLine, &i);
+
 		if (currLine[i] == EOF || currLine[i] == ';' || currLine[i] == '\n' || currLine[i] == '\0') {
 			continue;
 		}
@@ -61,6 +63,9 @@ int preassembler_file(char* fileName) {
 			strcpy(macroName, splitLines[1]);
 			add_macro_to_table(macroTable, macroName, "");
 		}
+		else if (strcmp(splitLines[0], "endmcro") == 0){
+			macroFlag = 0;
+		}
 		else if (macroFlag == 1) {
 			char *newMacro = filename_suffix(get_macro_val(macroTable, macroName), currLine);
 			add_macro_to_table(macroTable, macroName, newMacro);
@@ -72,6 +77,7 @@ int preassembler_file(char* fileName) {
 		}
 
 		free_split_string(splitLines, numberOfLineWords);
+
 	}
 
 	/*free all the memory we have used*/
