@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "utils.h"
 #include "globals.h"
 #include "table.h"
@@ -17,10 +18,11 @@ char *filename_suffix(char *str1, char *str2)
 
 /*this function splites the strings by separator like char*/
 char **split_string(char *str, char *separator, int *count) {
-	int len = strlen(str);
-	int i = 0, j, k=0;
+	int length = strlen(str);
+	int i = 0, j, k=0, l=0;
+	char **substring;
 	int indexString = 0; /*count the number of substrings found during the process*/
-	char *strCopy = (char*) malloc((len + 1) * sizeof(char));
+	char *strCopy = (char*) malloc((length + 1) * sizeof(char));
 	*count = 0;
 	
 	if (strCopy == NULL) {
@@ -28,18 +30,18 @@ char **split_string(char *str, char *separator, int *count) {
 	}
 	
 	strcpy(strCopy, str);
-
-	while (i<len) { /*count the number of substring*/
-		while (i<len && strchr(separator, strCopy[i]) != NULL) {
+	
+	while (i<length) { /*count the number of substring*/
+		while (i<length && strchr(separator, strCopy[i]) != NULL) {
 			i++;
 		}
 
 		j=i;
-		while (j<len && strchr(separator, strCopy[j]) == NULL) {
+		while (j<length && strchr(separator, strCopy[j]) == NULL) {
 			j++;
 		}
 
-		if (i<len && i<j) { /*found substring*/
+		if (i<length && i<j) { /*found substring*/
 			strCopy[j] = '\0'; /*marks the end of the substring*/
 			indexString++;
 		}
@@ -47,7 +49,7 @@ char **split_string(char *str, char *separator, int *count) {
 	} /*end of while loop*/
 
 	/*allocate memory for the array of substrings*/
-	char **substring = (char**) malloc(indexString * sizeof(char*));
+	substring = (char**) malloc(indexString * sizeof(char*));
 	if (substring == NULL) {
 		free(strCopy);
 		return NULL;
@@ -55,18 +57,18 @@ char **split_string(char *str, char *separator, int *count) {
 	
 	/*split the substrings and storing them in the array*/
 	i=0;
-	int l=0;
-	while (i<len && k < indexString) {
-		while (i<len && strchr(separator, strCopy[i]) != NULL) { 
+	l=0;
+	while (i<length && k < indexString) {
+		while (i<length && strchr(separator, strCopy[i]) != NULL) { 
 			i++;
 		} /*end of while loop*/
 
 		j=i;
-		while (j<len && strchr(separator, strCopy[j]) != NULL) { 
+		while (j<length && strchr(separator, strCopy[j]) == NULL) { 
 			j++;
 		} /*end of while loop*/
 
-		if (i<len && i<j) {
+		if (i<length && i<j) {
 			substring[k] = (char*) malloc((j-i+1)*sizeof(char));
 			if (substring[k] == NULL) { /*the memory allocation is failed*/
 				for (l=0; l<k; l++) {
@@ -101,7 +103,11 @@ void free_split_string(char **splitString, int count) {
 }
 
 
-
+void skip_white(char *str, int *i) {
+	while (str[*i] && isspace(str[*i])){
+		(*i)++;
+	}
+}
 
 
 
