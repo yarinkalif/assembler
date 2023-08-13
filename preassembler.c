@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "table.h"
 #include "utils.h"
+#include <string.h>
 #include "globals.h"
 
 
@@ -13,13 +14,15 @@ int preassembler_file(char* fileName) {
 	char *asFileName = filename_suffix(fileName, ".as");
 	FILE *asFile = fopen(asFileName, "r"); /*the original file*/
 
-	char currLine[MAX_LENGTH_LINE + 2];
+	char currLine[MAX_LENGTH_LINE + 2]; /*array of characters*/
 	char *macroName = NULL;
-	char **splitLines;
-	int numberOfLineWords = 0;
-	int i;
+	char *macroContent = NULL;	
 	macro_table *macroTable = create_macro_table();
 	int macroFlag = 0; 
+	macro *currentMacro;
+	macro *temp;
+	char *expendLine;
+
 
 	/*Checks whether the original file opens successfully*/
 	if(asFile == NULL) {
@@ -42,52 +45,71 @@ int preassembler_file(char* fileName) {
 		return 0;		
 	}
 
-	while(fgets(currLine, MAX_LENGTH_LINE + 2, asFile)) {
-		i = 0;
-		skip_white(currLine, &i);
+	while(fgets(currLine, MAX_LENGTH_LINE + 2, asFile) != NULL) { /*reading the file line by line*/
+			/*printf("current line: %s\n", currLine);*/
+			/*strcpy(currLine, currLine + 4);*/
+			printf("current line: %s\n", currLine);
+			/*if (getchar(currLine) == '\n' || getchar(currLine) == EOF || getcar(currLine) == ';' || getchar(currLine) == '\0') {
+				continue;
+			}*/
+			if (strstr(currLine, "mcro") != NULL) {
+				macroFlag = 1;
+				macroName = (char *)malloc(MAX_MACRO_SIZE_NAME);
+				strcpy(currLine, currLine + 4);
+				printf("before: %s", currLine);
+				skip_white_spaces(currLine);
+				printf("after: %s", currLine);
+				/*printf("outside util ptr: %d\n", currLine);*/
+				strcpy(macroName, currLine);
 
-		if (currLine[i] == EOF || currLine[i] == ';' || currLine[i] == '\n' || currLine[i] == '\0') {
-			continue;
-		}
-		
-		splitLines = split_string(currLine+i, " ", &numberOfLineWords); /*split the lines by white space*/
+				/*fgets(macroName, MAX_MACRO_SIZE_NAME, asFile);*/
+				printf("macro name is: %s\n", macroName);
+				macroContent = (char *)malloc(MAX_LENGTH_LINE + 2);
 
-		/*print the macros*/
-		if (get_macro_val(macroTable, splitLines[0]) != NULL) {
-			fputs(get_macro_val(macroTable, splitLines[0]), amFile);
-		}
-		/*if there is macro, add it to the table*/
-		else if (strcmp(splitLines[0], "mcro") == 0) {
-			macroFlag = 1;
-			macroName = (char*) malloc(sizeof(char)*MAX_MACRO_SIZE_NAME);
-			strcpy(macroName, splitLines[1]);
-			add_macro_to_table(macroTable, macroName, "");
-		}
-		else if (strcmp(splitLines[0], "endmcro") == 0){
-			macroFlag = 0;
-		}
-		else if (macroFlag == 1) {
-			char *newMacro = filename_suffix(get_macro_val(macroTable, macroName), currLine);
-			add_macro_to_table(macroTable, macroName, newMacro);
-			free(newMacro);
-		}
-		/*not a macro line*/
-		else {
-			fputs(currLine, amFile);
+				while (fgets(currLine, MAX_LENGTH_LINE + 2, asFile) != NULL) {
+					printf("current line: %s\n", currLine);
+					if (strstr(currLine, "endmcro") != NULL) {
+						macroFlag = 0;
+						add_macro_to_table(macroTable, macroName, macroContent);
+						break;
+					}
+					if (macroFlag) { /*we are still in macro definition*/
+						strcat(macroContent, currLine);
+					}
+				}
+				/*for debug*/
+				/*currentMacro = macroTable->head;
+				while (currentMacro != NULL) {
+					printf("Macro Name: %s\nMacro Content: %s\n", currentMacro->macroName, currentMacro->macroContent);
+					currentMacro = currentMacro->next;
+				}*/
+			}
+			else { /*if find nacro name, print his content instead*/
+				expendLine = expend_macro(currLine, macroTable);
+				if (expendLine != NULL) {
+					fputs(expendLine, amFile);
+					free(expendLine);
+				}
+				else { /*regular line*/
+					fputs(currLine, amFile);
+				}
+			}
 		}
 
-		free_split_string(splitLines, numberOfLineWords);
-
-	}
 
 	/*free all the memory we have used*/
-	free(amFileName);
-	fclose(amFile);
-	free(asFileName);
-	fclose(asFile);
-	free_macro_table(macroTable);
-	if (macroName != NULL) {
-		free(macroName);
+	currentMacro = macroTable->head;
+	while (currentMacro != NULL) {
+		temp = currentMacro;
+		currentMacro = currentMacro->next;
+		free(temp->macroName);
+		free(temp->macroContent);
+		free(temp);
 	}
+	free(macroTable);
+	free(macroName);
+	free(macroContent);
+	fclose(asFile);
+	fclose(amFile);
 	return 1;
 }
