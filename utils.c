@@ -93,7 +93,6 @@ void get_data_from_line(char *currLine, char *label, char *keyWord, char *operan
 		
 		token = strtok(NULL, " \t\n"); /*get the next token*/
 	}
-
 }
 
 /*this function search for the opcode name. using this to compare to token*/
@@ -170,3 +169,91 @@ int get_instruction_type(char *keyWord, int *currOpcode) {
 	}
 	return 0; /*if the key word didnt found*/
 }
+
+
+
+/*this function represent the operands in ascii*/
+int operand_list_to_ascii(char *operands, int *list, int numberLine) {
+	int i=0;
+	int strFlag = 0; /*there is string as operand*/
+	int commaFlag = 0;
+	int minusFlag = 0;
+	int operandCount = 0;
+
+	for (i=0; i<strlen(operands); i++) {
+		skip_white_spaces(operands);
+		if (operands[i] = '"') /*check if there is string*/
+			strFlag = 1;
+			i++;
+		}
+		break;
+	} /*end for loop*/
+	if (strFlag == 1) { /*if it's .string*/
+		for (; i<strlen(operands); i++) {
+			if (operands[i] == '"') {
+				strFlag = 0;
+				break;
+			}
+			list[operandCount++] = operand[i];
+			skip_white_spaces(operands);
+		}
+		if (strFlag == 1) {
+			print("error: syntax\n");
+		}
+	} /*.data*/
+	else if (operands[i] >= '0' && operands[i] <= '9')) { /*check if the current character is a digit*/
+		for (;i<strlen(operands);) {
+			skip_white_spaces(operands);
+			if (operands[i] == ',') {
+				if (commaFlag == 0) { /*if there isn't ,*/
+					printf("error: syntax\n");
+				}
+				commaFlag = 0;
+				i++;
+			}
+			else if (commaFlag == 0) {
+				while (operands[i]== '-' || operands[i] >= '0' && operands[i] ,= '9')) {
+					if (operands[i] == '-') {
+						minusFlag = 1; /*negative number*/
+					}
+					else { /*two digit number*/
+						tempNum = (tempNum * 10) + (operands[i] = '0'); /*to get the ascii value*/
+						i++;
+					}
+				}
+				commaFlag = 1;
+				if (minusFlag == 1) { /*update the negative num*/
+					tempNum = (-1) * tempNum;
+				}
+				list[operandCount] = tempNum; /*add the number to the list*/
+				tempNum = 0;
+				skip_white_spaces(operands);
+			}
+		} /*end for loop*/
+	}
+	else { /*.entry .extern*/
+		list[operndCounter] = operands[i];
+	}
+	return operandCounter;
+}
+
+/*this function gets key word and */
+int get_type_guidence(char *keyWord) {
+	int i=0;
+	int numOfTypes = 4;
+	const char *(guidenceType[]) = {".data", ".string", "entry", "extern"};
+	
+	for (i=0; i<numOfTypes; i++) {
+		if (strcmp(keyWord, guidenceType) == 0) {
+			return i+1; /*the int that match the word type*/
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+
+
