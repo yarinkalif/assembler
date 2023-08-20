@@ -4,6 +4,8 @@
 
 int first_pass(char* fileName)
 {
+	int ic = IC;
+	int DC = DC;
 	int currNumberLine = 0;
 
 	/*open the .am file*/
@@ -21,6 +23,8 @@ int first_pass(char* fileName)
 			printf("error: alloctaion error of line);
 			
 	}
+
+	
 }
 
 /*this function define the line - empty, instruction, guidence or note*/
@@ -29,8 +33,6 @@ int define_line() {
 	int currNumLine = 0;
 	char label, keyWord, operands;
 	int checkLabel = 0;
-	int IC = 100;
-	int DC = 0;
 
 	data_image_ptr instruction_head = NULL;
 	data_image_ptr instruction_tail = NULL;
@@ -62,15 +64,65 @@ int define_line() {
 
 
 /*this function get the data line*/
-int line_data_image(data_image_ptr *currLine, data_image_ptr *currLinePtr, data_image_ptr *tailPtr, int typeOfSentence, long address, char *keyWord, char *operand, int numberLine) {
-	data_image_ptr = (data_image*) malloc(sizeof(data_image));
+int line_data_image(data_image_ptr *currLine, data_image_ptr *currLinePtr, data_image_ptr *tailPtr, int typeOfSentence, long address, char *keyWord, char *operands, int numberLine) {
+	int srcCodeflag = 1;
+	long currAddress = address;
+	int countLine = 0;
+
+	data_image_ptr currPtr = (data_image*) malloc(sizeof(data_image));
+
+	if (!currPtr) {
+		printf("error: allocation memory\n");
+	}
 
 	switch (typeOfSentence)
 	{
 		case INSTRUCTION_LINE:
 		{
-			
+			/*define the correct value*/
+			line_instruction_binary(currPtr->machine_code, keyWord, operands, numberLine);
+			strcpy(currPtr->src_code, currLine);
+			currPtr->address = address;
+			currPtr->next = NULL;
 
+			/**/
+			(*currLinePtr) = currPtr;
+			return NEXT_ADDRESS;
+			break;
+		}
+		case GUIDENCE_LINE:
+		{
+			int *listOfOperands = (int*)malloc(MAX_LENGTH_LINE * sizeof(int));
+			if (!listOfOperands) {
+				printf("error allocation\n");
+	
+			int numOfOperands = operand_list_to_ascii(operands, listOfOperands, numberLine);
+
+			typeOfLine = get_type_guidence(keyWord);
+			if (typeOfLine == 0) {
+				printf("error: key word incorrect\n");
+			}
+			/*go over the operands*/
+			for (i=0; i<numOfOperands; i++) {
+				tempLine = (data_image*)malloc(sizeof(data_image);
+				if (!tempLine) {
+					printf("error allocation memory\n");
+				}
+				/*every operand added to the machine code*/
+				line_guidence_binary(tempLine->machine_code, keyWord, listOfOperands[i], currLine, typeOfLine, numberLine);
+
+				if (srcCodeflag == 1) { /*adding the source code*/
+					strcpy(tempLine->src_code, currLine);
+					srcCodeflag = 0;
+				}
+
+				switch (typeOfLine) {
+					case DATA:
+						tempLine->address = currAddress + countLine;
+						currAddress = currAddress + 12;
+						break;
+					case STRING:
+						
 
 }
 
