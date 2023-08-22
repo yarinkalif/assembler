@@ -13,6 +13,20 @@
 #define IC 100
 #define DC 0
 
+extern Symbol* symbol_table;
+
+/* Defines a line in a file and contains its info - file name, the number of the line and the content of the line */
+typedef struct line_info{
+    char *filename;
+    int line_number;
+    char *content;
+} line_info; 
+
+/* Define a symbol table */ 
+typedef struct {
+    s_table_entry **entries; 
+} s_table;
+
 /* Enum for error codes */
 typedef enum {
     ERROR_FILE_READ,            
@@ -108,6 +122,10 @@ struct opcodeInfo opcodeTable[MAX_OPCODES] = {
 	{"rts", 14};
 	{"stop", 15};
 };
+/*defines a machine word*/
+typedef struct data_word { 
+    unsigned int data: 12;
+} data_word;
 
 typedef struct data_image *data_image_ptr;
 
@@ -181,4 +199,12 @@ typedef union guidanceData{
 		unsigned int word: 12;	
 	}guidance;
 	int size: 12;
-}DataCodE;
+}DataCode;
+
+/* Defines a machine word of registers operands - Can contain destination register & source register */
+typedef struct register_word {
+    unsigned int ARE: 2;
+    unsigned int dest_register: 5;
+    unsigned int src_register: 5;
+} register_word;
+
