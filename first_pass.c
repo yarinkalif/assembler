@@ -2,22 +2,21 @@
 #include <stdlib.h>
 #include "first_pass.h"
 
-
-int first_pass(char* fileName)
+int first_pass(char *currLine, s_table *symbolTable, ic, dc, data_word dataImage, int lineNumber)
 {
-	int IC = IC;
-	int DC = DC;
+	int IC = ic;
+	int DC = dc;
 	int currNumberLine = 0;
 	char currLine[MAX_LENGTH_LINE];
 	char label, keyWord, operands;
 
 	/*open the .am file*/
-	FILE *assemblyFile = NULL;
+	/*FILE *assemblyFile = NULL;
 	assemblyFile = fopen(fileName, "r");
 	if(assemblyFile == NULL) {
 		printf("The file is failed.\n");
 		return 0;
-	}
+	}*/
 	
 	while (fgets(currLine, sizeof(currLine), assemblyFile)) {
         	currNumberLine++;
@@ -195,6 +194,3 @@ int line_data_image(data_image_ptr *currLine, data_image_ptr *currLinePtr, data_
 }
 
 	
-
-
-
