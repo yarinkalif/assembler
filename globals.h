@@ -2,11 +2,14 @@
 #include <stdlib.h>
 
 
-#define MAX_LENGTH_LINE 10000
+#define MAX_LENGTH_LINE 81
 #define MAX_OPCODES 16
-#define MACHINE_CODE_LENGTH 30
-#define MAX_MEMORY_SIZE 924
+#define MACHINE_CODE_LENGTH 12
+#define MAX_MEMORY_SIZE 1024
+#define MAX_LABEL_LENGTH 31
+#define MAX_SYMBOL_LENGTH 31
 #define NEXT_ADDRESS 1
+#define SYMBOL_TYPE_DATA 'd'
 #define IC 100
 #define DC 0
 
