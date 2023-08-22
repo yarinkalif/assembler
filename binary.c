@@ -166,5 +166,41 @@ void int_to_binary(char *machineCode, int curr, int numOfBit) {
     }
 }
 
+static char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+
+char *base64_encode(unsigned char *input, size_t inputLength) {
+	size_t outputLength = 4*((inputLength+2)/3;
+	char* encodedData = (char*)malloc(outputLength + 1);
+	if (encodedData == NULL) {
+		return NULL;
+	}	
+	size_t i, j=0;
+	for (i = 0; i < inputLength; i += 3) {
+		uint32_t value = 0;
+		int count = 0;
+		for (j = 0; j < 3; j++) {
+			value <<= 8;
+			if (i + j < inputLength) {
+				value |= input[i + j];
+				count++;
+			}
+		}
+
+		for (j=0; j<4; j++) {
+			encoded_data[i*4/3+j] = count > j ? base64_chars[(value >> (6*(3-j))) & 0x3F] : '=';
+		}
+	}
+
+	encoded_data[output_length] = '\0';
+	return encoded_data;
+}
+
+char *encode_binary_word_to_base64(uint16_t binaryWord) {
+	/*convert the 12-bit binary word to 2 bytes*/
+	unsigned char bytes[2];
+	bytes[0] = (binaryWord >> 4) & 0xFF;
+	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
+	return base64_encode(bytes,2);
+}
 
