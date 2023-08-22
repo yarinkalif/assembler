@@ -8,6 +8,8 @@ int first_pass(char* fileName)
 	int IC = IC;
 	int DC = DC;
 	int currNumberLine = 0;
+	char currLine[MAX_LENGTH_LINE];
+	char label, keyWord, operands;
 
 	/*open the .am file*/
 	FILE *assemblyFile = NULL;
@@ -17,14 +19,19 @@ int first_pass(char* fileName)
 		return 0;
 	}
 	
-	while (!feof(assemblyFile))
-	{
-		char *currLine = (char*)calloc()
-		if (!currLine) {
-			printf("error: alloctaion error of line\n");		
-	}
+	while (fgets(currLine, sizeof(currLine), assemblyFile)) {
+        	currNumberLine++;
+		int typeOfLine = define_line(currLine, label, keyWord, operands);
+		if (typeOfSentence == 0) { /*empty or invalid line, skip processing.*/
+			continue;
+		}
+
+	data_image_ptr currLinePtr = NULL;
+	data_image_ptr tailPtr = NULL;
+
+	int lineDataImg = line_data_image(&currLinePtr, &tailPtr, typeOfSentence, 0, keyWord, operands, currNumberLine, &IC, &DC);
 	
-	/*fclose(source_file);*/
+	fclose(assemblyFile);
 	}/*end of  while (read_next_line(source_file, line))*/
 /	return 1;
 }/*end of void first_pass(FILE *source_file)*/ 
@@ -32,7 +39,7 @@ int first_pass(char* fileName)
 
 
 
-/*this function define the line - empty, instruction, guidence or note*/
+/*The function defines which line it is about. Is it a command line, an empty line, an instruction or a comment*/
 int define_line(char *currLine) {
 	char currLine[MAX_LENGTH_LINE];
 	int currNumLine = 0;
@@ -48,7 +55,7 @@ int define_line(char *currLine) {
 	while (fgets(currLine, MAX_LENGTH_LINE + 2, asFile) != NULL) {
 		char *field = strtok(line, " \t\n");
 		if (field == NULL) {
-			continue; // Empty or whitespace-only line, skip processing.
+			continue; /*empty or whitespace-only line, skip processing.*/
 		}
 		char guidence_type = process_field(field);
 		typeOfSentence = type_of_sentence(currLine); 
@@ -109,7 +116,7 @@ int line_data_image(data_image_ptr *currLine, data_image_ptr *currLinePtr, data_
 			currPtr->next = NULL;
 			(*ic)++;
 
-			/**/
+			/*The pointer moves to the next position after it*/
 			(*currLinePtr) = currPtr;
 			return NEXT_ADDRESS;
 			break;
