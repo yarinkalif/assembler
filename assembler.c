@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "first_pass.h"
-#include "preassembler.h"
-#include "table.h"
-#include "globals.h"
-#include "utils.h"
+
 #include "assembler.h"
+#include "first_pass.h"
+#include "table.h"
+#include "errors.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,17 +27,19 @@ int main(int argc, char *argv[])
 return fileSuccess;
 }
 
-
+/*this function calls to the preassembler, first past and second past functions*/
 int assembly_to_machine_code(char* fileName)
 {	long ic = 0, dc = 0;
-	int success = 0;
-	char tmpLine[MAX_LENGTH_LINE + 2];
-	line_info currLine;
-	s_table *symbolTable = NULL;
-	data_word dataImage[MAX_MEMORY_SIZE] = {0}; /* contains the data image of the file */
+	int success = 0, line_number = 0;
+	char *currLine = (char*)calloc(MAX_LENGTH_LINE + 2, sizeof(char));
+	char *amFileName = (char*)malloc(256 * sizeof(char));
 
-	preassembler_file(fileName);
-	if (!preassembler_file) {
+	FILE *file_desc;
+	s_table *symbolTable = NULL;
+	
+
+	success = preassembler_file(fileName);
+	if (success != 1) {
 		printf("couldn't spread the macros correctly into %s.as\n", fileName);
 	}
 	
@@ -47,28 +48,31 @@ int assembly_to_machine_code(char* fileName)
 	if (file_desc == NULL) {
 		printf("couldn't open the file %s.\n", ".am");
 		free(amFileName);
-		return FALSE;
+		return 0;
 	}
 
 	/*starting first pass*/
-	symbolTable = initialize_symbol_table();
-	currLine.filename = amFileName;
-	currLine.content = tmpLine;
-	for (currLine.line_number=1; fgets(tmpLine, MAX_LENGTH_LINE + 2, file_desc) != NULL; currLine.lineNumber++) {
-		/*check if the line is too long*/
-		if (strchr(tmpLine, '\n') == NULL && !feof(file_desc)) {		
-			handle_error(ERROR_LINE_LENGTH, lineNumber);
+	symbolTable = create_symbol_table(); /*we storage the symbols here*/
+
+	while (fgets(currLine, MAX_LENGTH_LINE + 2, file_desc) != NULL) { /*go over every line in the file*/
+		if (strchr(currLine, '\n') == NULL && !feof(file_desc)) {
+			handle_error(ERROR_LINE_LENGTH, line_number); /*the length of line is too long*/
 			success = 0;
 		}
-		else {
-		success = first_pass(currLine, symbolTable, &ic, &dc, dataImage, lineNumber);
+		if (!currLine) {
+			handle_error(ERROR_MEMORY_ALLOCATION, line_number);
 		}
+		else {
+			printf("the line is:%s\n", currLine);
+			success = first_pass(file_desc, currLine, symbolTable, &ic, &dc, line_number);
+		}
+		line_number++;
 	}
 	
 	/*starting the second pass*/
-	rewind(file_desc);
+	/*rewind(file_desc);*/
 			
-		
+	free(amFileName);	
 	
 	return success;
 }
