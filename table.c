@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "table.h"
-#include "globals.h"
+
 
 
 /*this function creats the linked list*/
@@ -40,7 +40,6 @@ char *expend_macro(char *line, macro_table *table) {
 	while (curr != NULL){
 		char *macroPos = strstr(expendLine, curr->macroName); /*search for the macro name in the linked list*/
 		if (macroPos != NULL) { /*found the macro name*/
-			printf("22the line is: %s", expendLine);
 			strcpy(macroPos, curr->macroContent); /*replace the line with the macro content*/
 			return expendLine;
 		}
@@ -60,4 +59,14 @@ void free_macro_table(macro_table *table) {
 		free(temp->macroContent);
 		free(temp);
 	}
+}
+
+s_table *create_symbol_table() {
+	int i=0;
+	s_table *symbolTable = malloc(sizeof(s_table));
+	symbolTable->entries = malloc(sizeof(s_table_entry) * TABLE_SIZE);
+	for (i=0; i<TABLE_SIZE; i++) {
+		symbolTable->entries[i] = NULL;
+	}
+	return symbolTable;
 }
