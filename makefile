@@ -1,7 +1,7 @@
 CC = gcc # GCC Compiler
 CFLAGS = -ansi -Wall -pedantic # Flags
 GLOBALS_FILES = globals.h 
-ALL_OBJ =  utils.o table.o preassembler.o errors.o first_pass.o
+ALL_OBJ =  utils.o table.o preassembler.o errors.o first_pass.o binary.o
 
 assembler: assembler.h $(ALL_OBJ) $(GLOBALS_FILES)
 	$(CC) -g assembler.c $(CFLAGS) $(ALL_OBJ) -o $@
@@ -19,7 +19,7 @@ table.o: table.c table.h $(GLOBALS_FILES)
 utils.o: utils.c utils.h $(GLOBALS_FILES)
 	$(CC) -c utils.c $(CFLAGS) -o $@
 
-first_pass.o: first_pass.c first_pass.h $(GLOBALS_FILES)
+first_pass.o: first_pass.c first_pass.h binary.h $(GLOBALS_FILES)
 	$(CC) -c first_pass.c $(CFLAGS) -o $@
 
 binary.o: binary.c binary.h $(GLOBALS_FILES)
