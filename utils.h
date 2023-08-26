@@ -49,7 +49,9 @@ int is_symbol(char* field);
 
 int is_alphanumeric(char* str);
 
-void create_files (struct entry_symbols **head, struct extern_symbols **head, int create_entry_file, int create_extern_file);
+void create_files (struct entry_symbols **head_entry, struct extern_symbols **head_extern, int create_entry_file, int create_extern_file);
+
+void reverse_string(char *str);
 
 /*void ensure_address_in_bounds(int address);
 
