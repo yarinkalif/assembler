@@ -45,10 +45,20 @@ void handle_error(int error_code, int line_counter) {
             break;
         case ERROR_TOO_MANY_OPERANDS:
 		printf("Error - Too many operands provided%d\n", line_counter);  /* Too many operands*/
-            break;
+	break;
 	case ERROR_MEMORY_ALLOCATION:
 		printf("Error - memory allocation failed%d\n", line_counter); /*memory allocation*/
+	break;
 	case LABEL_EXIST:
 		printf("Error - label already exist%d\n", line_counter); /*label exist*/
+	break;
+	case ERROR_UNDECLEARED_ENTRY:
+		printf("Error - there is no entries%d\n", line_counter); /*no entries*/
+	break;
+	case ERROR_UNDECLEARED_EXTERN:
+		printf("Error - there is no externs%d\n", line_counter); /*no externs*/
+	case ERROR_MULTIPLE_SYMBOLS:
+		printf("Error - too mani symbols%d\n", line_counter); /*too many symbols*/
+	break;
     }
 }
