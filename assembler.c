@@ -67,7 +67,6 @@ int assembly_to_machine_code(char* fileName)
 			handle_error(ERROR_MEMORY_ALLOCATION, line_number);
 		}
 		else {
-			printf("the line is:%s\n", currLine);
 			success = first_pass(file_dest, currLine, symbolTable, &ic, &dc, line_number);
 		}
 		line_number++;
