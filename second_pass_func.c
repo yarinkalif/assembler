@@ -123,7 +123,7 @@ int end_of_file (FILE *file_ptr) {
 /* Returns if reached to end of file
    gets source file pointer and skips spaces and tabs in the current line in the file
    if reached to end of file returns 1 and if not returns 0 */
-char get_word (FILE *file_ptr) {
+char *get_word (FILE *file_ptr) {
 	
 	char current_character = fgetc(file_ptr); /* current character in the line */
 	char *word = (char*)malloc(MAX_LENGTH_LINE * sizeof(char));
@@ -143,7 +143,7 @@ char get_word (FILE *file_ptr) {
 }
 
 
-void print_64 (FILE *filename, unsigned int listOfData[MAX_LENGTH_LINE], unsigned int listOfInstruction[MAX_LENGTH_LINE], uint16_t binaryWord, int IC, int DC) {
+void print_64 (int listOfData[MAX_LENGTH_LINE], int listOfInstruction[MAX_LENGTH_LINE], uint16_t binaryWord, int IC, int DC) {
 
 	int i = 0;
 	FILE *file_ptr;
@@ -153,13 +153,13 @@ void print_64 (FILE *filename, unsigned int listOfData[MAX_LENGTH_LINE], unsigne
 		return;
 	}
 
-	file_ptr = fopen(filename, "w");
+	/*file_ptr = fopen(filename, "w");
 
 	if (file_ptr == NULL)
 	{
 		printf ("Can't open a file for 64 base output\n");
 		return;
-	}
+	}*/
 
 
 	while (i <= IC) {
@@ -176,8 +176,8 @@ void print_64 (FILE *filename, unsigned int listOfData[MAX_LENGTH_LINE], unsigne
 		}
 	}
 
-	rewind (file_ptr);
+	/*rewind (file_ptr);*/
 	fprintf (file_ptr, "%d ", IC);
-	fprintf (file_ptr, "%d", DC);
-	fclose (file_ptr);
+	fprintf (file_ptr,"%d", DC);
+	/*fclose (file_ptr);*/
 }
