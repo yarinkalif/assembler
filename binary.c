@@ -38,13 +38,13 @@ void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruc
 /*identify the operand type*/
 OperandType identify_operand_type(char *operand) {
     if (operand[0] == '@' && operand[1] == 'r' && operand[2] >= '0' && operand[2] <= '7' && operand[3] == '\0') {
-        return REGISTER;
+        return OPERAND_REGISTER;
     } else if (isdigit(operand[0]) || (operand[0] == '-' && isdigit(operand[1]))) {
-        return NUMBER;
+        return OPERAND_NUMBER;
     } else if (operand[0] == '"' && operand[strlen(operand) - 1] == '"') {
-        return STRING;
+        return OPERAND_STRING;
     } else {
-        return LABEL;
+        return OPERAND_LABEL;
     }
 }
 
@@ -66,32 +66,32 @@ instruction_type create_instruction_1(char *keyword, char *operands, int currOpc
 	operandType operand_2_type = identify_operand_type(operand2);
 
 	switch (operand_1_type) {
-		case REGISTER:
+		case OPERAND_REGISTER:
 			instr.instruction_line.operandSrc = operand1[2] - '0'; /*convert int to char*/
 			break;
-		case LABEL:
+		case OPERAND_LABEL:
 			break;
-		case STRING:
+		case OPERAND_STRING:
 			instr.instruction_line.operandSrc = operand1;
 			break;
-		case NUMBER:
+		case OPERAND_NUMBER:
 			instr.instruction_line.operandSrc = operand1;
 			break;
 	}
 	switch (operand_2_type) {
-		case REGISTER:
+		case OPERAND_REGISTER:
 			instr.instruction_line.operandDst = operand1[2] - '0'; /*convert int to char*/
 			break;
-		case LABEL:
+		case OPERAND_LABEL:
 			break;
-		case STRING:
+		case OPERAND_STRING:
 			instr.instruction_line.operandDst = operand1;
 			break;
-		case NUMBER:
+		case OPERAND_NUMBER:
 			instr.instruction_line.operandDst = operand1;
 			break;
 	}
-	instr.instruction_line.are = 0;
+	instr.instruction_line.ARE = 0;
 	return instr;
 }	
 
@@ -107,10 +107,10 @@ instruction_type create_instruction_2(char *keyword, char *operands, int currOpc
 	operandType operand_type = identify_operand_type(operands);
 
 	switch (operandType) { /*the source operand is always 0*/
-		case REGISTER:
+		case OPERAND_REGISTER:
 			instr.instruction_line.operandSrc = 0;
 			instr.instruction_line.operandDst = operand1[2] - '0'; /*convert int to char*/
-		case LABEL:
+		case OPERAND_LABEL:
 			break;
 	}	
 	instr.instruction_line.str = 0;	
@@ -121,7 +121,7 @@ instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfK
 	instr->instruction_line.opcode = currOpcode;
 	instr.instruction_line.operandSrc = 0; /*the source operand is always 0*/
 	instr.instruction_line.operandDst = 0; /*the destination operand is always 0*/
-	instr.instruction_line.str = 0;
+	instr.instruction_line.ARE = 0;
 }
 
 
@@ -199,4 +199,6 @@ char *encode_binary_word_to_base64(uint16_t binaryWord) {
 	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
 	return base64_encode(bytes,2);
 }
+
+
 
