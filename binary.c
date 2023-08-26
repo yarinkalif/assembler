@@ -19,16 +19,16 @@ void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruc
 	switch (typeOfKeyWord) {
 		case INSTRUCTION_GROUP_1:
 			currLine1 = create_instruction_1(keyWord, operands, currOpcode, typeOfKeyWord, numberLine);
-			int_to_binary(machineCode, currLine1.size.WORD);
+			int_to_binary(machineCode, currLine1.size.WORD, WORD);
 			break;
 
 		case INSTRUCTION_GROUP_2:
 			currLine2 = creat_instruction_2(keyWord, operands, currOpcode, typeOfKeyWord, numberLine);
-			int_to_binary(machineCode, currLine2.size.WORD);
+			int_to_binary(machineCode, currLine2.size.WORD, WORD);
 			break;
 		case INSTRUCTION_GROUP_3:
 			currLine3 = create_instruction_3(keyWord, currOpcode, typeOfKeyWord, numberLine);
-			int_to_binary(machineCode, currLine3.size.WORD);
+			int_to_binary(machineCode, currLine3.size.WORD, WORD);
 }
 
 
@@ -67,31 +67,31 @@ instruction_type create_instruction_1(char *keyword, char *operands, int currOpc
 
 	switch (operand_1_type) {
 		case REGISTER:
-			instr.instruction.operandSrc = operand1[2] - '0'; /*convert int to char*/
+			instr.instruction_line.operandSrc = operand1[2] - '0'; /*convert int to char*/
 			break;
 		case LABEL:
 			break;
 		case STRING:
-			instr.instruction.operandSrc = operand1;
+			instr.instruction_line.operandSrc = operand1;
 			break;
 		case NUMBER:
-			instr.instruction.operandSrc = operand1;
+			instr.instruction_line.operandSrc = operand1;
 			break;
 	}
 	switch (operand_2_type) {
 		case REGISTER:
-			instr.instruction.operandDst = operand1[2] - '0'; /*convert int to char*/
+			instr.instruction_line.operandDst = operand1[2] - '0'; /*convert int to char*/
 			break;
 		case LABEL:
 			break;
 		case STRING:
-			instr.instruction.operandDst = operand1;
+			instr.instruction_line.operandDst = operand1;
 			break;
 		case NUMBER:
-			instr.instruction.operandDst = operand1;
+			instr.instruction_line.operandDst = operand1;
 			break;
 	}
-	instr.instruction.str = 0;
+	instr.instruction_line.are = 0;
 	return instr;
 }	
 
@@ -108,20 +108,20 @@ instruction_type create_instruction_2(char *keyword, char *operands, int currOpc
 
 	switch (operandType) { /*the source operand is always 0*/
 		case REGISTER:
-			instr.instruction.operandSrc = 0;
-			instr.instruction.operandDst = operand1[2] - '0'; /*convert int to char*/
+			instr.instruction_line.operandSrc = 0;
+			instr.instruction_line.operandDst = operand1[2] - '0'; /*convert int to char*/
 		case LABEL:
 			break;
 	}	
-	instr.instruction.str = 0;	
+	instr.instruction_line.str = 0;	
 }
 
 instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfKeyWord, int numberLine) {
 	instruction_word instr;
-	instr->instruction.opcode = currOpcode;
-	instr.instruction.operandSrc = 0; /*the source operand is always 0*/
-	instr.instruction.operandDst = 0; /*the destination operand is always 0*/
-	instr.instruction.str = 0;
+	instr->instruction_line.opcode = currOpcode;
+	instr.instruction_line.operandSrc = 0; /*the source operand is always 0*/
+	instr.instruction_line.operandDst = 0; /*the destination operand is always 0*/
+	instr.instruction_line.str = 0;
 }
 
 
@@ -149,14 +149,13 @@ void line_guidence_binary(char *machineCode, char *keyWord, long dataList, int t
 /*this function convert integer to binary represantation*/
 void int_to_binary(char *machineCode, int curr, int numOfBit) {
 	unsigned mask = 1;
-	int numOfByte=0;
 
 	for (; mask; mask << 1) {
-		if (numOfByte != 0) {
+		if (numOfBit != 0) {
 			char bit;
 			bit = (mask & curr)? '1':'0'; /*Check if the current bit is 1 or 0*/
 			strncat(machineCode, &bit, 1); /*Append the bit to the machineCode string*/
-			numOfByte--; /*Decrease the number of remaining bytes*/
+			numOfBit--; /*Decrease the number of remaining bytes*/
 		}
 	}
 	strcat(machineCode, "\0"); /*Add the EOF marker to the end of the code*/
@@ -200,10 +199,4 @@ char *encode_binary_word_to_base64(uint16_t binaryWord) {
 	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
 	return base64_encode(bytes,2);
 }
-
-
-
-
-
-
 
