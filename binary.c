@@ -15,7 +15,7 @@ void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruc
 	instruction_word currLine2;
 	instruction_word currLine3;
 
-	int typeOfKeyWord = get_instruction_type(keyWord, &currOpcode);
+	int typeOfKeyWord = get_instruction_type(keyWord);
 
 	switch (typeOfKeyWord) {
 		case INSTRUCTION_GROUP_1:
@@ -51,20 +51,21 @@ OperandType identify_operand_type(char *operand) {
 
 /*this function create the instruction of group 1 - the group with two operands*/
 instruction_word create_instruction_1(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
+	char *operand1 = strtok((char *)operands, ",");
+	char *operand2 = strtok(NULL, ",");
+	/*idenify the operand types*/
+	OperandType operand_1_type = identify_operand_type(operand1);
+	OperandType operand_2_type = identify_operand_type(operand2);
+	
 	instruction_word instr;
 	instr.instruction_line.opcode = currOpcode;
 
-	char *operand1 = strtok((char *)operands, ",");
-	char *operand2 = strtok(NULL, ",");
 
 	if (!operand1 || !operand2) {
 		printf("error: missing operand\n");
 		instr.size = 0;
 		return instr;
 	}
-	/*idenify the operand types*/
-	OperandType operand_1_type = identify_operand_type(operand1);
-	OperandType operand_2_type = identify_operand_type(operand2);
 
 	switch (operand_1_type) {
 		case OPERAND_REGISTER:
@@ -73,23 +74,23 @@ instruction_word create_instruction_1(char *operands, int currOpcode, int typeOf
 		case OPERAND_LABEL:
 			break;
 		case OPERAND_STRING:
-			instr.instruction_line.operandSrc = operand1;
+			instr.instruction_line.operandSrc = *operand1;
 			break;
 		case OPERAND_NUMBER:
-			instr.instruction_line.operandSrc = operand1;
+			instr.instruction_line.operandSrc = *operand1;
 			break;
 	}
 	switch (operand_2_type) {
 		case OPERAND_REGISTER:
-			instr.instruction_line.operandDst = operand1[2] - '0'; /*convert int to char*/
+			instr.instruction_line.operandDst = operand2[2] - '0'; /*convert int to char*/
 			break;
 		case OPERAND_LABEL:
 			break;
 		case OPERAND_STRING:
-			instr.instruction_line.operandDst = operand1;
+			instr.instruction_line.operandDst = *operand2;
 			break;
 		case OPERAND_NUMBER:
-			instr.instruction_line.operandDst = operand1;
+			instr.instruction_line.operandDst = *operand2;
 			break;
 	}
 	instr.instruction_line.ARE = 0;
@@ -98,14 +99,15 @@ instruction_word create_instruction_1(char *operands, int currOpcode, int typeOf
 
 /*this function create the instruction of group 2 - the group with two operands*/
 instruction_word create_instruction_2(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
+	OperandType operand_type = identify_operand_type(operands);	
 	instruction_word instr;
 	instr.instruction_line.opcode = currOpcode;
 
+
 	if (operands == NULL) {
-		printf("error: missing operand\n");
+		handle_error(ERROR_WRONG_OPERAND_COUNT, numberLine);
 		return instr;
 	}
-	OperandType operand_type = identify_operand_type(operands);
 
 	switch (operand_type) { /*the source operand is always 0*/
 		case OPERAND_REGISTER:
@@ -114,6 +116,8 @@ instruction_word create_instruction_2(char *operands, int currOpcode, int typeOf
 			break;
 		case OPERAND_LABEL:
 			break;
+		default:
+			handle_error(ERROR_INVALID_OPERAND_TYPE, numberLine);
 	}	
 	instr.instruction_line.ARE = 0;	
 	return instr;
@@ -155,7 +159,7 @@ void line_guidence_binary(char *machineCode, char *keyWord, long dataList, int t
 void int_to_binary(char *machineCode, int curr, int numOfBit) {
 	unsigned mask = 1;
 
-	for (; mask; mask << 1) {
+	for (; mask; mask <<= 1) {
 		if (numOfBit != 0) {
 			char bit;
 			bit = (mask & curr)? '1':'0'; /*Check if the current bit is 1 or 0*/
@@ -173,10 +177,10 @@ static char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 char *base64_encode(unsigned char *input, size_t inputLength) {
 	size_t outputLength = 4*((inputLength+2)/3);
 	char* encodedData = (char*)malloc(outputLength + 1);
+	size_t i, j=0;
 	if (encodedData == NULL) {
 		return NULL;
 	}	
-	size_t i, j=0;
 	for (i = 0; i < inputLength; i += 3) {
 		uint32_t value = 0;
 		int count = 0;
@@ -195,18 +199,17 @@ char *base64_encode(unsigned char *input, size_t inputLength) {
 
 	encodedData[outputLength] = '\0';
 	return encodedData;
+	free(encodedData);
 }
 
 char *encode_binary_word_to_base64(uint16_t binaryWord) {
 	/*convert the 12-bit binary word to 2 bytes*/
 	unsigned char bytes[2];
+	char *encoded = base64_encode(bytes, 2);
 	bytes[0] = (binaryWord >> 4) & 0xFF;
 	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
-	char *encoded = base64_encode(bytes, 2);
 
 	free(encoded);
 	return encoded;
 }
-
-
 
