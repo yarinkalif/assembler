@@ -30,7 +30,6 @@ void handle_guidence(char* field, char* operands);
 
 void get_data_from_line(char *currLine, char *label, char *keyWord, char *operands, int numberLine);
 
-
 int symbol_exists(char* symbol_name, SymbolTable* current_table);
 
 int get_instruction_type(instruction_word *keyWord);
@@ -44,6 +43,8 @@ Symbol *insert_symbol(char* symbol_name, int value, char type);
 void create_files (struct entry_symbols **head_entry, struct extern_symbols **head_extern, int create_entry_file, int create_extern_file);
 
 void reverse_string(char *str);
+
+void handle_error(int error_code, int line_counter);
 
 void skip_whitespaces(FILE *file_ptr);
 
@@ -60,6 +61,8 @@ int check_symbol(FILE *file_ptr, char *word, int line_counter, int enable_error)
 int add_symbol(FILE *file_ptr, char *word, int line_counter, int enable_error);
 
 int empty_line(FILE *file_ptr);
+
+int second_pass(FILE *file_ptr);
 
 int end_of_file(FILE *file_ptr);
 
