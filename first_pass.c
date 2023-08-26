@@ -7,26 +7,26 @@
 #include "binary.h"
 
 
-int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC, long *DC, int lineNumber) {
-	IC = 0; /*instruction counter*/
-	DC = 0; /*data counter*/
+int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, long *DC, int lineNumber) {
+
 	int currNumberLine = 0; /*count the number of lines*/
 	int guidenceLineCount = 0;
-	char tmpCurrLine[MAX_LENGTH_LINE], label[MAX_SYMBOL_LENGTH], keyWord[MAX_LENGTH_KEY_WORD], operands[MAX_LENGTH_LINE];
-
+	char *tmpCurrLine[MAX_LENGTH_LINE], label[MAX_SYMBOL_LENGTH], keyWord[MAX_LENGTH_KEY_WORD], operands[MAX_LENGTH_LINE];
+	int typeOfSentence = type_of_sentence(currLine); /*check the type of line*/
 	data_image_ptr instructionHead = NULL, instructionTail = NULL, ptrInstruction;
 	data_image_ptr guidenceHead = NULL, guidenceTail = NULL;
 	Symbol *symbolHead = NULL, *symbolTail = NULL, *ptrSymbol;
 
-	
-	int typeOfSentence = type_of_sentence(currLine); /*check the type of line*/
-	printf("type of sentence is:%d\n", typeOfSentence);
+	IC = 0; /*instruction counter*/
+	DC = 0; /*data counter*/
+
 	
 	currNumberLine++;
 
 	if (typeOfSentence == INSTRUCTION_LINE || typeOfSentence == GUIDANCE_LINE) {
 		strcpy(tmpCurrLine, currLine);
 		get_data_from_line(tmpCurrLine, label, keyWord, operands, lineNumber);
+
 		/*checking if the label exist, if not it will add to the symbol table*/
 		if (label[0] != '\0') {
 			int checkLabel = symbol_exists(&label[0], symbolTable);
@@ -105,7 +105,7 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 
 
 /*this function get the data line*/
-int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC) {
+int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, s_table *symbolTable, long *IC, long *DC) {
 
 	int srcCodeflag = 1, strLength = strlen(currLine), countLine = 0, dataIndex = 0, i, listOfData[MAX_LENGTH_LINE], listOfInstruction[MAX_LENGTH_LINE], numOfOperands;
 	long currAddress = address;
@@ -126,7 +126,6 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 			strcpy(currPtr->src_code, currLine);
 			currPtr->address = address;
 			currPtr->next = NULL;
-			listOfInstruction[dataIndex++];
 			(*IC)++;
 
 			/*The pointer moves to the next position after it*/
@@ -170,7 +169,6 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						currPtr->next = NULL;
 						*tailPtr = currPtr;
 					}
-				listOfData[dataIndex++];
 				(*DC)++;
 				countLine++;
 				} /*end for loop*/
@@ -203,7 +201,6 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						tempLine->next = NULL;
 						(*tailPtr) = tempLine;
 					}
-					listOfData[dataIndex++];
 					(*DC)++;
 				} /*end of for loop*/
 			} /*end of else if*/	
