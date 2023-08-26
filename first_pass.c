@@ -20,9 +20,6 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 	IC = 0; /*instruction counter*/
 	DC = 0; /*data counter*/
 
-	printf("the curr line:%s\n", currLine);
-
-	
 	currNumberLine++;
 
 	if (typeOfSentence == INSTRUCTION_LINE || typeOfSentence == GUIDANCE_LINE) {
