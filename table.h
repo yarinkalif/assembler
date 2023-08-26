@@ -18,10 +18,6 @@ typedef struct {
 	macro *head;
 } macro_table;
 
-/*typedef struct s_table{
-	char **entries;
-} s_table;*/
-
 /* Define an entry in a symbols table */
 typedef struct s_table_entry{
 	char *symbol;
