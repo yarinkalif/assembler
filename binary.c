@@ -164,7 +164,7 @@ void int_to_binary(char *machineCode, int curr, int numOfBit) {
 		}
 	}
 	strcat(machineCode, "\0"); /*Add the EOF marker to the end of the code*/
-	strrev(machineCode); /*change the order of bits to match the actual binary representation*/
+	reverse_string(machineCode); /*change the order of bits to match the actual binary representation*/
 }
 
 static char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
