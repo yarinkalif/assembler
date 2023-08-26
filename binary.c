@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <ctype.h>
 #include "globals.h"
 #include "utils.h"
 #include "binary.h"
@@ -23,15 +24,15 @@ void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruc
 			break;
 
 		case INSTRUCTION_GROUP_2:
-			currLine2 = creat_instruction_2(keyWord, currOpcode, typeOfKeyWord, numberLine);
+			currLine2 = create_instruction_2(keyWord, currOpcode, typeOfKeyWord, numberLine);
 			int_to_binary(machineCode, currLine2.size, WORD);
 			break;
 		case INSTRUCTION_GROUP_3:
 			currLine3 = create_instruction_3(keyWord, currOpcode, typeOfKeyWord, numberLine);
 			int_to_binary(machineCode, currLine3.size, WORD);
+			break;
+	}
 }
-
-
 
 
 
@@ -49,7 +50,7 @@ OperandType identify_operand_type(char *operand) {
 }
 
 /*this function create the instruction of group 1 - the group with two operands*/
-instruction_type create_instruction_1(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
+instruction_word create_instruction_1(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
 	instruction_word instr;
 	instr.instruction_line.opcode = currOpcode;
 
@@ -59,7 +60,7 @@ instruction_type create_instruction_1(char *operands, int currOpcode, int typeOf
 	if (!operand1 || !operand2) {
 		printf("error: missing operand\n");
 		instr.size = 0;
-		/*return instr;*/
+		return instr;
 	}
 	/*idenify the operand types*/
 	OperandType operand_1_type = identify_operand_type(operand1);
@@ -92,17 +93,17 @@ instruction_type create_instruction_1(char *operands, int currOpcode, int typeOf
 			break;
 	}
 	instr.instruction_line.ARE = 0;
-	/*return instr;*/
+	return instr;
 }	
 
 /*this function create the instruction of group 2 - the group with two operands*/
-instruction_type create_instruction_2(char *keyword, char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
+instruction_word create_instruction_2(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
 	instruction_word instr;
 	instr.instruction_line.opcode = currOpcode;
 
 	if (operands == NULL) {
 		printf("error: missing operand\n");
-		/*return instr;*/
+		return instr;
 	}
 	OperandType operand_type = identify_operand_type(operands);
 
@@ -110,18 +111,22 @@ instruction_type create_instruction_2(char *keyword, char *operands, int currOpc
 		case OPERAND_REGISTER:
 			instr.instruction_line.operandSrc = 0;
 			instr.instruction_line.operandDst = operands[2] - '0'; /*convert int to char*/
+			break;
 		case OPERAND_LABEL:
 			break;
 	}	
 	instr.instruction_line.ARE = 0;	
+	return instr;
 }
 
-instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfKeyWord, int numberLine) {
+instruction_word create_instruction_3(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
 	instruction_word instr;
 	instr.instruction_line.opcode = currOpcode;
 	instr.instruction_line.operandSrc = 0; /*the source operand is always 0*/
 	instr.instruction_line.operandDst = 0; /*the destination operand is always 0*/
 	instr.instruction_line.ARE = 0;
+
+	return instr;
 }
 
 
@@ -197,12 +202,11 @@ char *encode_binary_word_to_base64(uint16_t binaryWord) {
 	unsigned char bytes[2];
 	bytes[0] = (binaryWord >> 4) & 0xFF;
 	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
-	return base64_encode(bytes,2);
+	char *encoded = base64_encode(bytes, 2);
+
+	free(encoded);
+	return encoded;
 }
-
-
-
-
 
 
 
