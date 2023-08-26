@@ -10,24 +10,24 @@
 /*this function represent the line instruction in binary*/
 void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruction, int numberLine) {
 	int currOpcode = 0;
-	instructionGroup currLine1;
-	instructionGroup currLine2;
-	instructionGroup currLine3;
+	instruction_word currLine1;
+	instruction_word currLine2;
+	instruction_word currLine3;
 
 	int typeOfKeyWord = get_instruction_type(keyWord, &currOpcode);
 
 	switch (typeOfKeyWord) {
-		case 1:
+		case INSTRUCTION_GROUP_1:
 			currLine1 = create_instruction_1(keyWord, operands, currOpcode, typeOfKeyWord, numberLine);
 			int_to_binary(machineCode, currLine1.size.WORD);
 			break;
 
-		case 2:
+		case INSTRUCTION_GROUP_2:
 			currLine2 = creat_instruction_2(keyWord, operands, currOpcode, typeOfKeyWord, numberLine);
 			int_to_binary(machineCode, currLine2.size.WORD);
 			break;
-		case 3:
-			currLine2 = create_instruction_3(keyWord, currOpcode, typeOfKeyWord, numberLine);
+		case INSTRUCTION_GROUP_3:
+			currLine3 = create_instruction_3(keyWord, currOpcode, typeOfKeyWord, numberLine);
 			int_to_binary(machineCode, currLine3.size.WORD);
 }
 
@@ -50,7 +50,7 @@ OperandType identify_operand_type(char *operand) {
 
 /*this function create the instruction of group 1 - the group with two operands*/
 instruction_type create_instruction_1(char *keyword, char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
-	instructionGroup1 instr;
+	instruction_word instr;
 	instr->instruction.opcode = currOpcode;
 
 	char *operand1 = strtok((char *)operands, ",");
@@ -97,7 +97,7 @@ instruction_type create_instruction_1(char *keyword, char *operands, int currOpc
 
 /*this function create the instruction of group 2 - the group with two operands*/
 instruction_type create_instruction_2(char *keyword, char *operands, int currOpcode, int typeOfKeyWord, int numberLine) {
-	instructionGroup1 instr;
+	instruction_word instr;
 	instr->instruction.opcode = currOpcode;
 
 	if (operands == NULL) {
@@ -117,7 +117,7 @@ instruction_type create_instruction_2(char *keyword, char *operands, int currOpc
 }
 
 instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfKeyWord, int numberLine) {
-	instructionGroup1 instr;
+	instruction_word instr;
 	instr->instruction.opcode = currOpcode;
 	instr.instruction.operandSrc = 0; /*the source operand is always 0*/
 	instr.instruction.operandDst = 0; /*the destination operand is always 0*/
@@ -129,14 +129,15 @@ instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfK
 void line_guidence_binary(char *machineCode, char *keyWord, long dataList, int typeOfGuidence, int numberLine) {
 	DataCode currData; 
 	DataCode currStr;
+	char currChar;
 
 	switch(typeOfGuidence) {
 		case DATA:
-			currData.guidence.word = dataList;
+			currData.guidance.word = dataList;
 			int_to_binary(machineCode, currData.size, WORD);
 			break;
 		case STRING:
-			currStr.guidence.word = currStr;
+			currStr.guidance.word = currChar;
 			int_to_binary(machineCode, currStr.size, WORD);	
 			break;
 	} /*end of switch*/	
@@ -199,6 +200,10 @@ char *encode_binary_word_to_base64(uint16_t binaryWord) {
 	bytes[1] = ((binaryWord & 0xF) << 4) & 0xF0;
 	return base64_encode(bytes,2);
 }
+
+
+
+
 
 
 
