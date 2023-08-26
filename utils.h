@@ -50,15 +50,7 @@ void skip_whitespaces(FILE *file_ptr);
 
 int check_line(FILE *file_ptr, int line_counter);
 
-int check_word(char *word, int line_counter, int enable_error);
-
-int check_directive(FILE *file_ptr, char *word, int line_counter, int enable_error);
-
-int check_instruction(FILE *file_ptr, char *word, int line_counter, int enable_error);
-
-int check_symbol(FILE *file_ptr, char *word, int line_counter, int enable_error);
-
-int add_symbol(FILE *file_ptr, char *word, int line_counter, int enable_error);
+int check_word (char *word, int line_counter, int enable_error);
 
 int empty_line(FILE *file_ptr);
 
@@ -66,9 +58,9 @@ int second_pass(FILE *file_ptr);
 
 int end_of_file(FILE *file_ptr);
 
-char get_word(FILE *file_ptr);
+char *get_word(FILE *file_ptr);
 
-void print_64(unsigned int buffer_data[MAX_MEMORY_SIZE][1], unsigned int buffer_inst[MAX_MEMORY_SIZE][1], uint16_t binaryWord, int IC, int DC);
+void print_64 (int listOfData[MAX_LENGTH_LINE], int listOfInstruction[MAX_LENGTH_LINE], uint16_t binaryWord, int IC, int DC);
 
 
 #endif 
