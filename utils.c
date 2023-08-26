@@ -358,6 +358,43 @@ int is_alphanumeric(char* str) {
     return 1;
 }
 
+void create_files (struct entry_symbols **head, struct extern_symbols **head, int create_entry_file, int create_extern_file) {
+	FILE entry_ptr;
+	FILE extern_ptr;
+	struct entry_symbols *current_entry = *head;	
+	struct extern_symbols *current_extern = *head;
+
+	if (create_entry_file == 1) { /*check if entry exists*/
+		entry_ptr = fopen(".entries", "w");
+
+		if (entry_ptr == NULL) { /*failed to open file for entries*/
+			printf("error in creating .entries file: failed to open file for entries\n");
+		}
+		else {
+			while (current_entry != NULL) { /*print the entries*/
+				fprintf(entry_ptr, "%s  ", current_entry->name);
+				fprintf(extern_ptr, "%d\n", current_entry->dec_num);
+				current_entry = current_entry->next_entry;
+			}
+			fclose(entry_ptr);
+		}
+	}
+	if (create_extern_file == 1) { /*check if extern exists*/
+		extern_ptr = fopen(".externals", "w");
+		if (entry_ptr == NULL) { /*failed to open file for externals*/
+			printf("error in creating .externals file: failed to open file for externals\n");
+		}
+		else {
+			while (current_extern != NULL) { /*print the externals*/
+				fprintf(entry_ptr, "%s  ", current_extern->name);
+				fprintf(extern_ptr, "%d\n", current_extern->dec_num);
+				current_extern = current_extern->next_extern;
+			}
+			fclose(extern_ptr);
+		}
+	}
+}		
+
 /*The following function creates a limit on the address in memory*/
 /*void ensure_address_in_bounds(int address) {
     if (address < 0 || address >= MEMORY_SIZE) {
