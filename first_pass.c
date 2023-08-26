@@ -4,6 +4,7 @@
 #include "table.h"
 #include "utils.h"
 #include "globals.h"
+#include "binary.h"
 
 
 int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC, long *DC, int lineNumber) {
@@ -14,7 +15,7 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 	char tmpCurrLine[MAX_LENGTH_LINE], label[MAX_SYMBOL_LENGTH], keyWord[MAX_LENGTH_KEY_WORD], operands[MAX_LENGTH_LINE];
 
 	data_image_ptr instructionHead = NULL, instructionTail = NULL, ptrInstruction;
-	data_image_ptr guidenceHead = NULL, guidenceTail = NULL, ptrGuidence;
+	data_image_ptr guidenceHead = NULL, guidenceTail = NULL;
 	Symbol *symbolHead = NULL, *symbolTail = NULL, *ptrSymbol;
 
 	
@@ -47,7 +48,7 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 			}
 		}
 		else {
-			if (guidenceHead = NULL) {
+			if (guidenceHead == NULL) {
 				guidenceLineCount = line_data_image(&guidenceHead, &guidenceTail, currLine, *IC, typeOfSentence, keyWord, operands, 	currNumberLine, symbolTable, IC, DC);
 			}
 			else {
@@ -105,13 +106,11 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 
 /*this function get the data line*/
 int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC) {
-	int srcCodeflag = 1;
-	long currAddress = address;
-	int strLength = strlen(currLine);
-	int countLine = 0;
-	int i;
-	int *listOfOperands = (int*)malloc(MAX_LENGTH_LINE * sizeof(int));
 
+	int srcCodeflag = 1, strLength = strlen(currLine), countLine = 0, dataIndex = 0, i, listOfData[MAX_LENGTH_LINE], listOfInstruction[MAX_LENGTH_LINE], numOfOperands;
+	long currAddress = address;
+	char curr_char;
+	int *listOfOperands = (int*)malloc(MAX_LENGTH_LINE * sizeof(int));
 	data_image_ptr currPtr = (data_image*) malloc(sizeof(data_image));
 
 	if (!currPtr) {
@@ -123,24 +122,25 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 		case INSTRUCTION_LINE:
 		{
 			/*define the correct value*/
-			/*line_instruction_binary(currPtr->machine_code, keyWord, operands, numberLine);*/
+			line_instruction_binary(currPtr->machine_code, keyWord, listOfInstruction[dataIndex], numberLine);
 			strcpy(currPtr->src_code, currLine);
 			currPtr->address = address;
 			currPtr->next = NULL;
+			listOfInstruction[dataIndex++];
 			(*IC)++;
 
 			/*The pointer moves to the next position after it*/
 			(*currLinePtr) = currPtr;
 			return NEXT_ADDRESS;
 			break;
-		}
+		} /*end of instruction_line case*/
 		case GUIDANCE_LINE:
 		{	
 			if (get_type_guidence(keyWord) == 1) { /*if it's ".data"*/
 				if (!listOfOperands) {
 					printf("Error: Memory allocation failed.\n");
 				}
-				int numOfOperands = operand_list_to_ascii(operands, listOfOperands, numberLine);
+				numOfOperands = operand_list_to_ascii(operands, listOfOperands, numberLine);
 
 				for (i = 0; i < numOfOperands; i++) {
 					currPtr = (data_image*)malloc(sizeof(data_image));
@@ -149,7 +149,7 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 					}
 				
 					/*convert operand to machine code and update data image*/
-					line_guidence_binary(currPtr->machine_code, keyWord, listOfOperands[i], currLine, DATA, numberLine);
+					line_guidence_binary(currPtr->machine_code, ".data", listOfData[dataIndex], DATA, numberLine);
 			
 					/*update source code and data image properties*/
 					if (srcCodeflag == 1) {
@@ -170,11 +170,13 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						currPtr->next = NULL;
 						*tailPtr = currPtr;
 					}
+				listOfData[dataIndex++];
 				(*DC)++;
 				countLine++;
 				} /*end for loop*/
 				return countLine;
-			}
+			} /*end of if .data*/
+
 			else if(get_type_guidence(keyWord) == 2) { /*if it's ".string"*/
 				for (i = 0; i<strLength; i++) {
 					data_image_ptr tempLine = (data_image_ptr)malloc(sizeof(data_image));	
@@ -182,10 +184,10 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						handle_error(ERROR_MEMORY_ALLOCATION, numberLine);
 					}
 		
-					char curr_char = (i < strLength) ? currLine[i] : '\0'; /*add the null terminator and update DC*/
+					curr_char = (i < strLength) ? currLine[i] : '\0'; /*add the null terminator and update DC*/
 
 					/*encode the character and add to the machine code*/
-					line_guidence_binary(tempLine->machine_code, ".string", currLine[i], currLinePtr, STRING, 0);
+					line_guidence_binary(tempLine->machine_code, ".string", listOfData[dataIndex], STRING, numberLine);
 
 					/*update pointers and add source code and address*/
 					strcpy(tempLine->src_code, currLine);
@@ -201,18 +203,16 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						tempLine->next = NULL;
 						(*tailPtr) = tempLine;
 					}
+					listOfData[dataIndex++];
 					(*DC)++;
 				} /*end of for loop*/
-			}
-			/*else if (get_type_guidence(keyWord) == 4) {*/ /*if it's ".extern"*/
-				/*handle_instruction(field, strtok(NULL, ""));*/
-			/*}*/
-			
-		}
-	}
+			} /*end of else if*/	
+		} /*end of guidance line case*/
+	} /*end of switch*/
+
 	free(listOfOperands);
-		
+	free(currPtr);
 	return 0;
-}
+} /*end of line_data_image function*/
 
 
