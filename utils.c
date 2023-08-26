@@ -69,7 +69,7 @@ void skip_white_spaces(char currLine[]) {
 int type_of_sentence(char *currLine) {
 	
 	skip_white_spaces(currLine);
-	while (currLine != EOF){
+	while (*currLine != '\0') {
 		if ((strchr(currLine, '\t')) || (strchr(currLine, ' '))) {
 			return EMPTY_LINE;
 		}	
@@ -86,17 +86,18 @@ int type_of_sentence(char *currLine) {
 			return INSTRUCTION_LINE;
 		}
 	}
+	return INSTRUCTION_LINE;
 }
 
 
-/*The function receives a string and decides what type the field is - whether it is a symbol, a prompt or something else.
- It performs operations based on the type and returns a character that represents the type of the field*/
+/*The function receives a string and decides what type the field is - whether it is a symbol, a prompt or something else.*/
+/* It performs operations based on the type and returns a character that represents the type of the field*/
 /*char process_field(char* field, int IC) {
     if (is_symbol(field)) {
         insert_symbol(field, IC, 'c');
-        return 's';  /* symbol*/
+        return 's';*/  /* symbol*/
     /*} else if (strcmp(field, ".data") == 0 || strcmp(field, ".string") == 0) {
-        return 'd';  /* data_instruction*/
+        return 'd';*/  /* data_instruction*/
     /*} else if (strcmp(field, ".extern") == 0 || strcmp(field, ".entry") == 0) {
         return 'e';*/  /* external_entry_instruction */
   /*  } else {
@@ -127,12 +128,13 @@ int type_of_sentence(char *currLine) {
 void get_data_from_line(char *currLine, char *label, char *keyWord, char *operands, int numberLine) {
 	int labelFlag = 0;
 	char tempCurrLine[MAX_LENGTH_LINE];
+	char *token;
 
 	strcpy(tempCurrLine, currLine);
 	strcat(tempCurrLine, "\0");
 	skip_white_spaces(tempCurrLine);
 
-	char token = strtok(tempCurrLine, " \t\n");
+	token = strtok(tempCurrLine, " \t\n");
 
 	while(token != NULL) {
 		/*this is label*/
@@ -171,7 +173,7 @@ void get_data_from_line(char *currLine, char *label, char *keyWord, char *operan
 			return true;
 		}		
 	}
-	return false; /*if the opcode is not find*/
+	return false;*/ /*if the opcode is not find*/
 /*}*/
 
 
@@ -215,7 +217,7 @@ int get_instruction_type(instruction_word *keyWord) {
 			keyWord->instruction_line.operandDst = 3;
 			keyWord->instruction_line.opcode = 4;
 			keyWord->instruction_line.operandSrc = 3;
-			return opcodeTable1;		
+			/*return opcodeTable1[i];*/		
 		}
 	}
 	for (i=0; i<sizeOfKeyWordArray2; i++) {
@@ -224,7 +226,7 @@ int get_instruction_type(instruction_word *keyWord) {
 			keyWord->instruction_line.operandDst = 3;
 			keyWord->instruction_line.opcode = 4;
 			keyWord->instruction_line.operandSrc = 0;
-			return opcodeTable2;
+			/*return opcodeTable2[i];*/
 		}
 	}
 	for (i=0; i<sizeOfKeyWordArray3; i++) {
@@ -233,7 +235,7 @@ int get_instruction_type(instruction_word *keyWord) {
 			keyWord->instruction_line.operandDst = 0;
 			keyWord->instruction_line.opcode = 4;
 			keyWord->instruction_line.operandSrc = 0;
-			return opcodeTable3;
+			/*return opcodeTable3[i];*/
 		}
 	}
 	return 0;
@@ -326,18 +328,24 @@ int get_type_guidence(char* keyWord) {
 
 /*The function takes a symbol name, a numeric value, and a type. It adds the symbol to the global symbol table within the program.
  If the symbol already exists in the table, the program may return an error (if you were to run the method one after the other on the same symbol name).*/
-void insert_symbol(char* symbol_name, int value, char type) {
-    int i;
+Symbol *insert_symbol(char* symbol_name, int value, char type) {
+	int i;
+	Symbol *newSymbol;
 	for (i = 0; i < symbol_table.count; i++) {
 		if (strcmp(symbol_table.symbols[i].name, symbol_name) == 0) {
 		printf("Error: Symbol %s already exists!\n", symbol_name);
-		exit(1);
+		return 0;
 		}
 	}
-	strcpy(symbol_table.symbols[symbol_table.count].name, symbol_name);
-	symbol_table.symbols[symbol_table.count].value = value;
-	symbol_table.symbols[symbol_table.count].type = type;
+	newSymbol =  &symbol_table.symbols[symbol_table.count]; /* Pointer to the new symbol */
+	strcpy(newSymbol->name, symbol_name);
+	newSymbol->value = value;
+	newSymbol->type = type;
+	/*symbol_table.symbols[symbol_table.count].value = value;
+	symbol_table.symbols[symbol_table.count].type = type;*/
 	symbol_table.count++; /*enlarging the table*/
+
+	return newSymbol;
 }
 
 
@@ -358,11 +366,12 @@ int is_alphanumeric(char* str) {
     return 1;
 }
 
-void create_files (struct entry_symbols **head, struct extern_symbols **head, int create_entry_file, int create_extern_file) {
-	FILE entry_ptr;
-	FILE extern_ptr;
-	struct entry_symbols *current_entry = *head;	
-	struct extern_symbols *current_extern = *head;
+
+void create_files (struct entry_symbols **head_entry, struct extern_symbols **head_extern, int create_entry_file, int create_extern_file) {
+	FILE *entry_ptr;
+	FILE *extern_ptr;
+	struct entry_symbols *current_entry = *head_entry;	
+	struct extern_symbols *current_extern = *head_extern;
 
 	if (create_entry_file == 1) { /*check if entry exists*/
 		entry_ptr = fopen(".entries", "w");
@@ -373,7 +382,7 @@ void create_files (struct entry_symbols **head, struct extern_symbols **head, in
 		else {
 			while (current_entry != NULL) { /*print the entries*/
 				fprintf(entry_ptr, "%s  ", current_entry->name);
-				fprintf(extern_ptr, "%d\n", current_entry->dec_num);
+				fprintf(entry_ptr, "%d\n", current_entry->dec_num);
 				current_entry = current_entry->next_entry;
 			}
 			fclose(entry_ptr);
@@ -386,7 +395,7 @@ void create_files (struct entry_symbols **head, struct extern_symbols **head, in
 		}
 		else {
 			while (current_extern != NULL) { /*print the externals*/
-				fprintf(entry_ptr, "%s  ", current_extern->name);
+				fprintf(extern_ptr, "%s  ", current_extern->name);
 				fprintf(extern_ptr, "%d\n", current_extern->dec_num);
 				current_extern = current_extern->next_extern;
 			}
@@ -394,44 +403,53 @@ void create_files (struct entry_symbols **head, struct extern_symbols **head, in
 		}
 	}
 }		
+		
+void reverse_string(char *str) {
+    int length = strlen(str), i;
+    for (i = 0; i < length / 2; i++) {
+        char temp = str[i];
+        str[i] = str[length - i - 1];
+        str[length - i - 1] = temp;
+    }
+}
 
 /*The following function creates a limit on the address in memory*/
 /*void ensure_address_in_bounds(int address) {
     if (address < 0 || address >= MEMORY_SIZE) {
         handle_error("Address out of bounds");
     }
-}
+}*/
 
 
 /*The following function takes care of putting data into memory*/
 /*void memory_insert(int address, unsigned int value) {
-    ensure_address_in_bounds(address);
+    ensure_address_in_bounds(address);*/
     
 	/*Check that the value is not too big for memory*/	
     /*if (value >= (1 << WORD_SIZE)) {
         handle_error("Value too large for memory word");
     }
     memory[address] = value;
-}
+}*/
 
 /*The following function delimits the size of the data that goes into memory*/
 /*void ensure_data_in_bounds(int data) {
     if (data < -(1 << (WORD_SIZE - 1)) || data >= (1 << (WORD_SIZE - 1))) {
         handle_error("Data out of bounds for word size");
     }
-}
+}*/
 
 /*The following function is a function for inserting a whole data (even a third) into memory using the 2's complement method*/
 /*void memory_insert_int(int address, int data) {
     ensure_data_in_bounds(data);
-    ensure_address_in_bounds(address);
+    ensure_address_in_bounds(address);*/
 
 /*    if (data < 0) {
-        memory[address] = (1 << WORD_SIZE) + data; /*Converting to 2's complement*/
+        memory[address] = (1 << WORD_SIZE) + data;*/ /*Converting to 2's complement*/
  /*   } else {
         memory[address] = data;
     }
-}
+}*/
 
 /*function to insert a character into memory (when the character is ASCII)*/
 /*void memory_insert_char(int address, char ch) {
