@@ -21,9 +21,9 @@
 /*extern Symbol* symbol_table;  Head of the linked list */
 
 
-int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC, long *DC, int lineNumber);
+int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, long *DC, int lineNumber);
 
-int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC);
+int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, s_table *symbolTable, long *IC, long *DC);
 
 
 #endif
