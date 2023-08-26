@@ -7,11 +7,11 @@
 #include "binary.h"
 
 
-int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, long *DC, int lineNumber) {
+int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC, long *DC, int lineNumber) {
 
 	int currNumberLine = 0; /*count the number of lines*/
 	int guidenceLineCount = 0;
-	char *tmpCurrLine[MAX_LENGTH_LINE], label[MAX_SYMBOL_LENGTH], keyWord[MAX_LENGTH_KEY_WORD], operands[MAX_LENGTH_LINE];
+	char tmpCurrLine[MAX_LENGTH_LINE], label[MAX_SYMBOL_LENGTH], keyWord[MAX_LENGTH_KEY_WORD], operands[MAX_LENGTH_LINE];
 	int typeOfSentence = type_of_sentence(currLine); /*check the type of line*/
 	data_image_ptr instructionHead = NULL, instructionTail = NULL, ptrInstruction;
 	data_image_ptr guidenceHead = NULL, guidenceTail = NULL;
@@ -19,6 +19,8 @@ int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, lon
 
 	IC = 0; /*instruction counter*/
 	DC = 0; /*data counter*/
+
+	printf("the curr line:%s\n", currLine);
 
 	
 	currNumberLine++;
@@ -93,11 +95,7 @@ int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, lon
 	} /*end of if condition typeOfSentence == INSTRUCTION_LINE || typeOfSentence == GUIDANCE_LINE*/
 	
 	free(currLine);
-	
-	/*order the lines that instrucion after guidance*/
-	/*if (guidanceHade != NULL && instructinHead != NULL) {
-		
-	}*/
+
 	
 	return 1;
 }/*end of void first_pass(FILE *source_file)*/ 
@@ -105,7 +103,7 @@ int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, lon
 
 
 /*this function get the data line*/
-int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, s_table *symbolTable, long *IC, long *DC) {
+int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC) {
 
 	int srcCodeflag = 1, strLength = strlen(currLine), countLine = 0, dataIndex = 0, i, listOfData[MAX_LENGTH_LINE], listOfInstruction[MAX_LENGTH_LINE], numOfOperands;
 	long currAddress = address;
