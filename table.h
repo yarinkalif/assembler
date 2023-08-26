@@ -18,9 +18,9 @@ typedef struct {
 	macro *head;
 } macro_table;
 
-typedef struct s_table{
+/*typedef struct s_table{
 	char **entries;
-} s_table;
+} s_table;*/
 
 /* Define an entry in a symbols table */
 typedef struct s_table_entry{
@@ -38,9 +38,10 @@ typedef struct {
 	struct Symbol* next;
 } Symbol;
 
-typedef struct {
-    Symbol symbols[MAX_SYMBOL_LENGTH];
-    int count;
+typedef struct SymbolTable{
+	Symbol symbols[MAX_SYMBOL_LENGTH];
+	char **entries;
+	int count;
 } SymbolTable;
 
 SymbolTable symbol_table; 
@@ -53,6 +54,6 @@ char *expend_macro(char *line, macro_table *table);
 
 void free_macro_table(macro_table *table);
 
-s_table *create_symbol_table();
+SymbolTable *create_symbol_table();
 
 #endif
