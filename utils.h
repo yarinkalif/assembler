@@ -43,11 +43,13 @@ int operand_list_to_ascii(char *operands, int *list, int numberLine);
 
 int get_type_guidence(char *keyWord);
 
-void insert_symbol(char* symbol_name, int value, char type);
+Symbol *insert_symbol(char* symbol_name, int value, char type);
 
 int is_symbol(char* field);
 
 int is_alphanumeric(char* str);
+
+void create_files (struct entry_symbols **head, struct extern_symbols **head, int create_entry_file, int create_extern_file);
 
 /*void ensure_address_in_bounds(int address);
 
