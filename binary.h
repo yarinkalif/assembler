@@ -5,17 +5,16 @@
 #include "globals.h"
 #include "utils.h"
 #include "errors.h"
-#include "binary.h"
 
 void line_instruction_binary(char *machineCode, char *keyWord, int listOfInstruction, int numberLine);
 
 OperandType identify_operand_type(char *operand);
 
-instruction_type create_instruction_1(char *keyword, char *operands, int currOpcode, int typeOfKeyWord, int numberLine);
+instruction_word create_instruction_1(char *operands, int currOpcode, int typeOfKeyWord, int numberLine);
 
-instruction_type create_instruction_2(char *keyword, char *operands, int currOpcode, int typeOfKeyWord, int numberLine);
+instruction_word create_instruction_2(char *operands, int currOpcode, int typeOfKeyWord, int numberLine);
 
-instruction_type create_instruction_3(char *keyword, int currOpcode, int typeOfKeyWord, int numberLine);
+instruction_word create_instruction_3(char *operands, int currOpcode, int typeOfKeyWord, int numberLine) ;
 
 void line_guidence_binary(char *machineCode, char *keyWord, long dataList, int typeOfGuidence, int numberLine);
 
