@@ -18,17 +18,17 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 	Symbol *symbolHead = NULL, *symbolTail = NULL, *ptrSymbol;
 
 	
-
 	int typeOfSentence = type_of_sentence(currLine); /*check the type of line*/
-	printf("type of sentence is:%d\n" ,typeOfSentence);
+	printf("type of sentence is:%d\n", typeOfSentence);
 	
 	currNumberLine++;
+
 	if (typeOfSentence == INSTRUCTION_LINE || typeOfSentence == GUIDANCE_LINE) {
 		strcpy(tmpCurrLine, currLine);
 		get_data_from_line(tmpCurrLine, label, keyWord, operands, lineNumber);
 		/*checking if the label exist, if not it will add to the symbol table*/
 		if (label[0] != '\0') {
-			int checkLabel = symbol_exists(label[0], symbolTable);
+			int checkLabel = symbol_exists(&label[0], symbolTable);
 			if (checkLabel) {
 				handle_error(LABEL_EXIST, lineNumber);
 			}
@@ -36,22 +36,22 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 		/*create the data image*/
 		if (typeOfSentence == INSTRUCTION_LINE ) {
 			if (instructionHead == NULL) {
-				IC = IC + line_data_image(&instructionHead, NULL, currLine, IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable);
+				IC = IC + line_data_image(&instructionHead, NULL, currLine, *IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable, IC, DC);
 				instructionHead->next = NULL;
 				instructionTail = instructionHead;
 			}
 			else {
-				IC = IC + line_data_image(&ptrInstruction, NULL, currLine, IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable);
+				IC = IC + line_data_image(&ptrInstruction, NULL, currLine, *IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable, IC, DC);
 				instructionTail->next = ptrInstruction;			
 				instructionTail = instructionTail->next;
 			}
 		}
 		else {
 			if (guidenceHead = NULL) {
-				guidenceLineCount = line_data_image(&guidenceHead, &guidenceTail, currLine, IC, typeOfSentence, keyWord, operands, 	currNumberLine, symbolTable);
+				guidenceLineCount = line_data_image(&guidenceHead, &guidenceTail, currLine, *IC, typeOfSentence, keyWord, operands, 	currNumberLine, symbolTable, IC, DC);
 			}
 			else {
-				guidenceLineCount = line_data_image(&guidenceHead, &guidenceTail, currLine, IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable);
+				guidenceLineCount = line_data_image(&guidenceHead, &guidenceTail, currLine, *IC, typeOfSentence, keyWord, operands, currNumberLine, symbolTable, IC, DC);
 			}
 			DC = DC + guidenceLineCount;
 		}
@@ -62,7 +62,7 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 			
 			strcat(label, "\0");
 			if (typeOfSentence == INSTRUCTION_LINE) { /*the line is instruction*/
-				currAddress = IC - NEXT_ADDRESS;
+				currAddress = *IC - NEXT_ADDRESS;
 			}
 			else { /*the other lines*/
 				currAddress = *IC + *DC - guidenceLineCount;
@@ -104,12 +104,13 @@ int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC,
 
 
 /*this function get the data line*/
-int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable) {
+int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC) {
 	int srcCodeflag = 1;
 	long currAddress = address;
 	int strLength = strlen(currLine);
 	int countLine = 0;
 	int i;
+	int *listOfOperands = (int*)malloc(MAX_LENGTH_LINE * sizeof(int));
 
 	data_image_ptr currPtr = (data_image*) malloc(sizeof(data_image));
 
@@ -122,11 +123,11 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 		case INSTRUCTION_LINE:
 		{
 			/*define the correct value*/
-			line_instruction_binary(currPtr->machine_code, keyWord, operands, numberLine);
+			/*line_instruction_binary(currPtr->machine_code, keyWord, operands, numberLine);*/
 			strcpy(currPtr->src_code, currLine);
 			currPtr->address = address;
 			currPtr->next = NULL;
-			/*(*ic)++;*/
+			(*IC)++;
 
 			/*The pointer moves to the next position after it*/
 			(*currLinePtr) = currPtr;
@@ -136,7 +137,6 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 		case GUIDANCE_LINE:
 		{	
 			if (get_type_guidence(keyWord) == 1) { /*if it's ".data"*/
-				int *listOfOperands = (int*)malloc(MAX_LENGTH_LINE * sizeof(int));
 				if (!listOfOperands) {
 					printf("Error: Memory allocation failed.\n");
 				}
@@ -170,7 +170,7 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						currPtr->next = NULL;
 						*tailPtr = currPtr;
 					}
-				/*(*dc)++;*/
+				(*DC)++;
 				countLine++;
 				} /*end for loop*/
 				return countLine;
@@ -201,7 +201,7 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 						tempLine->next = NULL;
 						(*tailPtr) = tempLine;
 					}
-					/*(*dc)++;*/
+					(*DC)++;
 				} /*end of for loop*/
 			}
 			/*else if (get_type_guidence(keyWord) == 4) {*/ /*if it's ".extern"*/
@@ -210,12 +210,9 @@ int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *
 			
 		}
 	}
+	free(listOfOperands);
 		
 	return 0;
 }
-	
-	
-	
-
 
 
