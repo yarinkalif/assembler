@@ -15,19 +15,17 @@ int second_pass(FILE *file_ptr) {
 	char current_character; /* current character in line */
 	char *current_word; /* current word in the line */
 	int line_counter = 1; /* counts the lines */
-	int character_counter = 1; /* counts the characters */
 	int result;
 	int create_entry_file = 0;
 	int create_extern_file = 0;
 	int IC = 0; /* instruction counter */
 	int DC = 0;
 	int i = 0;
-	int entry_symbols[MAX_SYMBOL_LENGTH];
-	int extern_symbols[MAX_SYMBOL_LENGTH];
+	char entry_symbols[MAX_SYMBOL_LENGTH][MAX_SYMBOL_LENGTH];
+	char extern_symbols[MAX_SYMBOL_LENGTH][MAX_SYMBOL_LENGTH];
 	int listOfData[MAX_LENGTH_LINE];
 	int listOfInstruction[MAX_LENGTH_LINE];
-	int binaryWord;
-	SymbolTable symbolTable;
+	int binaryWord = 0;
 
 	while (end_of_file(file_ptr) == 0 && 1) { /* skips whitespaces and checks the file */
 
@@ -67,7 +65,7 @@ int second_pass(FILE *file_ptr) {
 
 			if (strcmp(current_word, ".entry") == 0) {
 				current_word = get_word(file_ptr);
-				while (i < strlen(entry_symbols)) {
+				while (i < strlen(entry_symbols[i])) {
 					if (strcmp(current_word, entry_symbols[i]) == 0) {
 						create_entry_file = 1;
 						break;
@@ -82,7 +80,7 @@ int second_pass(FILE *file_ptr) {
 			else if (strcmp(current_word, "current_word") == 0) {
 				current_word = get_word(file_ptr);
 
-					while (i < strlen(extern_symbols)) {
+					while (i < strlen(extern_symbols[i])) {
 						if (strcmp(current_word, extern_symbols[i]) == 0) {
 							create_extern_file = 1;
 							break;
@@ -104,7 +102,9 @@ int second_pass(FILE *file_ptr) {
 			}
 		}
     	}
-	print_64(file_ptr, listOfData, listOfInstruction, binaryWord, IC, DC);
-	return 1;
+	print_64(listOfData, listOfInstruction, binaryWord, IC, DC);
+	rewind (file_ptr);
 	free(current_word);
+	free(file_ptr);
+	return 1;
 }
