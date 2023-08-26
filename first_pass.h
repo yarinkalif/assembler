@@ -10,20 +10,9 @@
 #include "binary.h"
 
 
-/* Symbol structure and global declaration */
-/*typedef struct Symbol {
-	char name[MAX_SYMBOL_LENGTH];
-	int value;
-	char type;*/  /* 'c' for code */
-	/*struct Symbol* next;*/  /* Pointer to the next symbol in the list */
-/*} Symbol;*/
+int first_pass(FILE *asFile, char *currLine, SymbolTable *symbolTable, long *IC, long *DC, int lineNumber);
 
-/*extern Symbol* symbol_table;  Head of the linked list */
-
-
-int first_pass(FILE *asFile, char *currLine, s_table *symbolTable, long *IC, long *DC, int lineNumber);
-
-int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, s_table *symbolTable, long *IC, long *DC);
+int line_data_image(data_image_ptr *currLinePtr, data_image_ptr *tailPtr, char *currLine, long address, int typeOfSentence, char *keyWord, char *operands, int numberLine, SymbolTable *symbolTable, long *IC, long *DC);
 
 
 #endif
