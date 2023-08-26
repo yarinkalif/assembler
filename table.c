@@ -61,12 +61,14 @@ void free_macro_table(macro_table *table) {
 	}
 }
 
-s_table *create_symbol_table() {
+SymbolTable *create_symbol_table() {
 	int i=0;
-	s_table *symbolTable = malloc(sizeof(s_table));
+	SymbolTable *symbolTable = malloc(sizeof(SymbolTable));
 	symbolTable->entries = malloc(sizeof(s_table_entry) * TABLE_SIZE);
 	for (i=0; i<TABLE_SIZE; i++) {
 		symbolTable->entries[i] = NULL;
 	}
+	free(symbolTable);
+	free(symbolTable->entries);
 	return symbolTable;
 }
