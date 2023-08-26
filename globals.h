@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 
 #define MAX_LENGTH_LINE 81
@@ -14,58 +15,27 @@
 #define MAX_SYMBOL_LENGTH 31
 #define NEXT_ADDRESS 1
 #define SYMBOL_TYPE_DATA 'd'
+#define MAX_LENGTH_LINE_PTR 82
 
 
 /* Enum for error codes */
 typedef enum {
-    ERROR_FILE_READ = 1,            
-    ERROR_EMPTY_FILE ,           
-    ERROR_EOF_REACHED,           
-    ERROR_LINE_LENGTH, 
-    ERROR_WORD_LENGTH, 
-    ERROR_SYMBOL_LENGTH, 
-    ERROR_INVALID_WORD, 
-    ERROR_INVALID_SYMBOL, 
-    ERROR_INVALID_OPERATION,     
-    ERROR_WRONG_OPERAND_COUNT,   
-    ERROR_INVALID_OPERAND_TYPE,  
-    ERROR_REGISTER_NOT_FOUND,       
-    ERROR_TOO_MANY_OPERANDS,  
+	ERROR_FILE_READ = 1,            
+	ERROR_EMPTY_FILE ,           
+	ERROR_EOF_REACHED,           
+	ERROR_LINE_LENGTH, 
+	ERROR_WORD_LENGTH, 
+	ERROR_SYMBOL_LENGTH, 
+	ERROR_INVALID_WORD, 
+	ERROR_INVALID_SYMBOL, 
+	ERROR_INVALID_OPERATION,     
+	ERROR_WRONG_OPERAND_COUNT,   
+	ERROR_INVALID_OPERAND_TYPE,  
+	ERROR_REGISTER_NOT_FOUND,       
+	ERROR_TOO_MANY_OPERANDS,  
 	ERROR_MEMORY_ALLOCATION,
 	LABEL_EXIST  
 } ErrorCode;
-
-
-/*symbols;
-symbols_entry;
-symbols_extern;*/
-
-/* Defines a line in a file and contains its info - file name, the number of the line and the content of the line */
-/*typedef struct line_info{
-    char *filename;
-    int line_number;
-    char *content;
-} line_info; */
-
-
-
-/*extern Symbol* symbol_table;*/
-/*extern struct opcodeInfo opcodeTable[];*/
-
-/* Symbol structure and global declaration */
-/*typedef struct {
-	char name[MAX_SYMBOL_LENGTH];
-	int value;
-	char type;
-	struct Symbol* next;
-} Symbol;*/
-
-/*typedef struct {
-    Symbol symbols[MAX_SYMBOL_LENGTH];
-    int count;
-} SymbolTable;
-
-SymbolTable symbol_table; */
 
 
 
@@ -94,15 +64,6 @@ typedef struct data_image{
 	char machine_code[MAX_LENGTH_LINE + 2];
 	data_image_ptr next;
 }data_image;
-
-/*typedef struct code_image *code_image_ptr;
-
-typedef struct {
-	long address;*/ /*where the line should be stored in memory*/
-	/*char operand_count;*/ /*number of operands*/
-	/*char operands[MAX_MEMORY_SIZE][MACHINE_CODE_LENGTH];
-	code_image_ptr next;
-}code_image;*/
 
 
 typedef enum {
@@ -134,17 +95,18 @@ typedef enum type_of_guidance{
 	EXTERN
 }type_guide;
 
-/*the bytes of word in instruction group using bitfiels*/
-typedef union instruction_word {
-	struct instruction_line {
-		unsigned int ARE: 2;
-		unsigned int operandDst: 3;
-		unsigned int opcode: 4;
-		unsigned int operandSrc: 3;
-	} instruction_line;
-	int size;
-} instruction_word;
+struct instruction_line {
+	unsigned int ARE: 2;
+	unsigned int operandDst: 3;
+	unsigned int opcode: 4;
+	unsigned int operandSrc: 3;
+	char *name;
+}instruction_line;
 
+typedef union instruction_word {
+    struct instruction_line instruction_line;
+    int size;
+} instruction_word;
 
 typedef union guidanceData{
 	struct guidance_word{
@@ -173,5 +135,6 @@ typedef struct extern_symbols {
     int dec_num;
     struct extern_symbols *next_extern;
 } extern_symbols;
+
 
 #endif 
