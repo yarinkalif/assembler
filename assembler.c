@@ -4,10 +4,16 @@
 #include "assembler.h"
 #include "first_pass.h"
 #include "table.h"
-#include "errors.h"
 #include "utils.h"
 #include "globals.h"
 
+/**
+ * The main function of the assembly-to-machine code program.
+ * It processes the input assembly files provided via command line arguments.
+ * @param argc Count of command-line arguments.
+ * @param argv Array of command-line arguments.
+ * @return Success status of file processing.
+ */
 int main(int argc, char *argv[])
 {
 	int fileSuccess = 0, i;
@@ -29,7 +35,12 @@ int main(int argc, char *argv[])
 return fileSuccess;
 }
 
-/*this function calls to the preassembler, first past and second past functions*/
+/**
+ * Transforms the provided assembly file into machine code.
+ * This function invokes the pre-assembler, first pass, and second pass functions.
+ * @param fileName The name/path of the assembly file to process.
+ * @return Success status of assembly to machine code conversion.
+ */
 int assembly_to_machine_code(char* fileName)
 {	long ic = 0, dc = 0;
 	int success = 0, line_number = 0, create_entry_file = 1, create_extern_file = 1;
@@ -41,12 +52,13 @@ int assembly_to_machine_code(char* fileName)
 	FILE *file_dest;
 	SymbolTable *symbolTable = NULL;
 	
-
+	/* Pre-assemble the input file */
 	success = preassembler_file(fileName);
 	if (success != 1) {
 		printf("couldn't spread the macros correctly into %s.as\n", fileName);
 	}
-	
+
+	/* Open the file with the .am suffix */
 	amFileName = filename_suffix(fileName, ".am");
 	file_dest = fopen(amFileName, "r");
 	if (file_dest == NULL) {
